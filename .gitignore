@@ -1,0 +1,17 @@
+
+build/*
+out/*
+out/
+bin/*
+classes/*
+*.jar
+*.class
+*.iml
+*.cfg
+*.mp3
+hs_err_pid*
+classes/*
+atlassian-ide-plugin.xml
+/bin
+*/build
+/build/
