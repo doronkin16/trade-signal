@@ -15,7 +15,6 @@ import org.json.*;
 public class CBinanceService extends CAbstractExchangeService {
     private static final String BASE_POINT = "https://api.binance.com/";
 
-//    private static final String QUERY_PING = "/api/v1/ping";
     private static final String QUERY_BOOK_TICKER = "/api/v1/exchangeInfo";
     private static final String QUERY_LAST_PRICE = "api/v3/ticker/price";
 
@@ -52,7 +51,6 @@ public class CBinanceService extends CAbstractExchangeService {
         }
         return tickers;
     }
-
 
     public Map<String, BigDecimal> loadLastPrice(Set<String> tickers) throws CExchangeException {
         String res = request(BASE_POINT + QUERY_LAST_PRICE);

@@ -12,8 +12,8 @@ import java.util.Timer;
 
 public class CPriceSignals {
 
-    IExchangeService exchangeService;
-    IExchangeConfig exchangeConfig;
+    private IExchangeService exchangeService;
+    private IExchangeConfig exchangeConfig;
 
     private List<IPriceLoadListener> priceListeners = new ArrayList<>();
     private List<IErrorListener> errorListeners = new ArrayList<>();
@@ -73,20 +73,20 @@ public class CPriceSignals {
                     return;
                 }
 
-                Map<String, BigDecimal> percant = new HashMap<>();
+                Map<String, BigDecimal> percent = new HashMap<>();
                 Map<String, BigDecimal> signalPrices = new HashMap<>();
                 final Map<String, BigDecimal> prevPricesFinal = prevPrices;
                 currentPrices.forEach((ticker, currentPrice) -> {
                     BigDecimal prevPrice = prevPricesFinal.getOrDefault(ticker, BigDecimal.ZERO);
-                    BigDecimal percantChanges = currentPrice.multiply(BigDecimal.valueOf(100)).divide(prevPrice, 4, 0).subtract(BigDecimal.valueOf(100));
-                    percant.put(ticker, percantChanges);
+                    BigDecimal percentChanges = currentPrice.multiply(BigDecimal.valueOf(100)).divide(prevPrice, 4, 0).subtract(BigDecimal.valueOf(100));
+                    percent.put(ticker, percentChanges);
 
-                    if (percantChanges.doubleValue() >= exchangeConfig.getChangesProp(ticker)) {
-                        signalPrices.put(ticker, percantChanges);
+                    if (percentChanges.doubleValue() >= exchangeConfig.getChangesProp(ticker)) {
+                        signalPrices.put(ticker, percentChanges);
                     }
                 });
 
-                firePriceListeners(percant, signalPrices);
+                firePriceListeners(percent, signalPrices);
 
             } catch (Exception e) {
                 fireErrorListeners(e);

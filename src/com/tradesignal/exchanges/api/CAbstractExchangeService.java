@@ -46,6 +46,4 @@ public abstract class CAbstractExchangeService implements IExchangeService {
             throw new CExchangeException("We have some error with request data from Exchange", e);
         }
     }
-
-
 }

@@ -9,6 +9,7 @@ package com.tradesignal.spring;
 import com.tradesignal.configuration.*;
 import com.tradesignal.exchanges.api.*;
 import com.tradesignal.signals.*;
+import org.springframework.beans.factory.annotation.*;
 import org.springframework.beans.factory.config.*;
 import org.springframework.context.annotation.*;
 import org.springframework.context.annotation.Scope;
@@ -16,24 +17,33 @@ import org.springframework.context.annotation.Scope;
 public class CContextConfiguration {
 
     @Bean(initMethod="initProperties")
-    public CBinanceConfig binanceConfig() {
-        return new CBinanceConfig(binanceService().loadAllTickers());
+    public CAppConfig appConfig() {
+        return new CAppConfig();
     }
 
     @Bean(initMethod="initProperties")
-    public CAppConfig appConfig() {
-        return new CAppConfig();
+    @Autowired
+    public CBinanceConfig binanceConfig(CBinanceService binanceService) {
+        return new CBinanceConfig(binanceService.loadAllTickers());
     }
 
     @Bean
     public CBinanceService binanceService() {
         return new CBinanceService();
     }
+    @Bean
+    public CExchangeServiceFactoryBean exchangeService() {
+        return new CExchangeServiceFactoryBean();
+    }
+
+    @Bean
+    public CExchangeConfigFactory exchangeConfigFactory() {
+        return new CExchangeConfigFactory();
+    }
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    @DependsOn(value = {"binanceService", "binanceConfig"})
-    public CPriceSignals binancePriceSignal() {
-        return new CPriceSignals(binanceService(), binanceConfig());
+    public CPriceSignals priceSignals(IExchangeService exchangeService, IExchangeConfig config) {
+        return new CPriceSignals(exchangeService, config);
     }
 }

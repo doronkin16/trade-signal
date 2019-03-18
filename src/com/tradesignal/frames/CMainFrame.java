@@ -24,7 +24,7 @@ public class CMainFrame extends JFrame implements IPriceLoadListener, IErrorList
 
     private CAppConfig appConfig;
 
-    private JTable persantTable;
+    private JTable percentTable;
     private JLabel attentionLabelJustLabel;
 
     public CMainFrame() {
@@ -35,8 +35,8 @@ public class CMainFrame extends JFrame implements IPriceLoadListener, IErrorList
     }
 
     private void init() {
-        appConfig = CSpringContextUtils.getApplicationContext().getBean(CAppConfig.class);
-        priceSignals = CSpringContextUtils.createSignal(appConfig.getExchange());
+        appConfig = CSpringContextUtils.getAppConfig();
+        priceSignals = CSpringContextUtils.getPriceSignals();
         priceSignals.addPriceLoopListener(this);
         priceSignals.addErrorListener(this);
 
@@ -46,9 +46,9 @@ public class CMainFrame extends JFrame implements IPriceLoadListener, IErrorList
     }
 
     private void createComponents() {
-        persantTable = new JTable(null, new Object[]{"Currency", "Percant"});
-        persantTable.setModel(new ThisColumnModel(new HashMap<>()));
-        JScrollPane sp = new JScrollPane(persantTable);
+        percentTable = new JTable(null, new Object[]{"Currency", "Percent"});
+        percentTable.setModel(new ThisColumnModel(new HashMap<>()));
+        JScrollPane sp = new JScrollPane(percentTable);
         sp.setPreferredSize(new Dimension(250, 500));
 
         attentionLabelJustLabel = new JLabel();
@@ -62,17 +62,17 @@ public class CMainFrame extends JFrame implements IPriceLoadListener, IErrorList
 
     private void initMenu() {
         JMenuBar menuBar = new JMenuBar();
-        JMenu settingsItem = new JMenu("Настройки");
+        JMenu settingsItem = new JMenu("Settings");
         menuBar.add(settingsItem);
 
-        JMenuItem generalSettingMenu = new JMenuItem("Общие настройки");
+        JMenuItem generalSettingMenu = new JMenuItem("General Settings");
         generalSettingMenu.addActionListener(event -> {
             CGeneralSettingFrame generalSettingFrame = new CGeneralSettingFrame();
             generalSettingFrame.setVisible(true);
         });
         settingsItem.add(generalSettingMenu);
 
-        JMenuItem signalSettingMenu = new JMenuItem("Настройки сигналов");
+        JMenuItem signalSettingMenu = new JMenuItem("Signal Settings");
         signalSettingMenu.addActionListener(event -> {
             CSettingsFrame settingsFrame = new CSettingsFrame();
             settingsFrame.setSize(500, 500);
@@ -80,7 +80,7 @@ public class CMainFrame extends JFrame implements IPriceLoadListener, IErrorList
         });
         settingsItem.add(signalSettingMenu);
 
-        JMenu themeItem = new JMenu("Темы");
+        JMenu themeItem = new JMenu("Themes");
         Arrays.stream(EThema.values()).map(thema -> {
             JRadioButtonMenuItem radioMenuItem = new JRadioButtonMenuItem(thema.getRealName());
             radioMenuItem.setSelected(thema == appConfig.getTheme());
@@ -113,7 +113,7 @@ public class CMainFrame extends JFrame implements IPriceLoadListener, IErrorList
     }
 
     private void updatePersantTable(Map<String, BigDecimal> persant) {
-        persantTable.setModel(new ThisColumnModel(persant));
+        percentTable.setModel(new ThisColumnModel(persant));
     }
 
     private void updateSignalPanel(Map<String, BigDecimal> signalMap) {
@@ -150,15 +150,17 @@ public class CMainFrame extends JFrame implements IPriceLoadListener, IErrorList
         List<Map.Entry<String, BigDecimal>> persant;
 
         public ThisColumnModel(Map<String, BigDecimal> persant) {
-            this.persant = persant.entrySet().stream().sorted((e1, e2) -> -e1.getValue().compareTo(e2.getValue())).collect(Collectors.toList());
+            this.persant = persant.entrySet().stream()
+                    .sorted((e1, e2) -> -e1.getValue().compareTo(e2.getValue()))
+                    .collect(Collectors.toList());
         }
 
         @Override
         public String getColumnName(int column) {
             if (column == 0) {
-                return "Валютная пара";
+                return "Currency pair";
             } else if (column == 1) {
-                return "Изменение за " + CSpringContextUtils.getExchangeConfig(appConfig.getExchange()).getChangesByTime() + "секунд, %";
+                return "Changes in " + CSpringContextUtils.getExchangeConfig().getChangesByTime() + " seconds, %";
             }
             return null;
         }
@@ -200,7 +202,7 @@ public class CMainFrame extends JFrame implements IPriceLoadListener, IErrorList
 
     private File findSignalMp3() {
         return Optional.ofNullable(appConfig.getNotificationSound())
-                .map(path -> new File(path))
+                .map(File::new)
                 .filter(file -> file.exists() && file.canRead() && file.isFile())
                 .orElse(null);
     }

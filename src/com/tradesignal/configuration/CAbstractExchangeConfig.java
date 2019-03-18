@@ -12,14 +12,13 @@ import java.util.Map;
 import java.util.Set;
 
 import com.tradesignal.signals.*;
-import org.springframework.beans.factory.annotation.*;
 
 public abstract class CAbstractExchangeConfig extends CAbstractConfigFile implements IExchangeConfig {
 
     private final static String PROP_CHANGES_TIME = "PROP_CHANGES_TIME";
 
     private final static int defaultChangesTime = 60; //in seconds
-    private final static double defaultChangesPercant = 1d;
+    private final static double defaultChangesPercent = 1d;
 
     private Set<String> tickers;
 
@@ -40,7 +39,7 @@ public abstract class CAbstractExchangeConfig extends CAbstractConfigFile implem
 
         if (!propFile.exists()) {
             properties.setProperty(PROP_CHANGES_TIME, String.valueOf(defaultChangesTime));
-            tickers.forEach(ticker -> properties.setProperty(ticker, String.valueOf(defaultChangesPercant)));
+            tickers.forEach(ticker -> properties.setProperty(ticker, String.valueOf(defaultChangesPercent)));
             savePropFile();
         } else {
             loadPropFile();
@@ -48,7 +47,7 @@ public abstract class CAbstractExchangeConfig extends CAbstractConfigFile implem
     }
 
     public double getChangesProp(String ticker) {
-        return Double.parseDouble(properties.getProperty(ticker, String.valueOf(defaultChangesPercant)));
+        return Double.parseDouble(properties.getProperty(ticker, String.valueOf(defaultChangesPercent)));
     }
 
     public void setChangesByTime(int seconds) {

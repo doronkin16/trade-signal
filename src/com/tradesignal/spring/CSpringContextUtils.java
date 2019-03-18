@@ -7,7 +7,6 @@
 package com.tradesignal.spring;
 
 import com.tradesignal.configuration.*;
-import com.tradesignal.exchanges.api.*;
 import com.tradesignal.signals.*;
 import org.springframework.beans.*;
 import org.springframework.context.*;
@@ -24,28 +23,23 @@ public class CSpringContextUtils implements ApplicationContextAware {
         return applicationContext;
     }
 
+    public static <T> T getBean(Class<T> t) {
+        return getApplicationContext().getBean(t);
+    }
+
     public static CAppConfig getAppConfig() {
         return applicationContext.getBean(CAppConfig.class);
     }
 
-    public static CAbstractExchangeConfig getExchangeConfig(EExchange exchange) {
-        if (exchange != null) {
-            switch (exchange) {
-                case BINANCE:
-                    return getApplicationContext().getBean(CBinanceConfig.class);
-            }
-        }
-        return null;
+    public static CPriceSignals getPriceSignals() {
+        return applicationContext.getBean(CPriceSignals.class);
     }
 
-    public static CPriceSignals createSignal(EExchange exchange) {
-        if (exchange != null) {
-            switch (exchange) {
-                case BINANCE:
-                    return new CPriceSignals(getApplicationContext().getBean(CBinanceService.class),
-                            getApplicationContext().getBean(CBinanceConfig.class));
-            }
-        }
-        return null;
+    public static IExchangeConfig getExchangeConfig() {
+        return applicationContext.getBean(CExchangeConfigFactory.class).getExchangeConfig(getAppConfig().getExchange());
+    }
+
+    public static CAbstractExchangeConfig getAbstractExchangeConfig(EExchange exchange) {
+        return applicationContext.getBean(CExchangeConfigFactory.class).getExchangeConfig(exchange);
     }
 }

@@ -17,11 +17,11 @@ import com.tradesignal.spring.*;
 
 public class CGeneralSettingFrame extends JFrame {
 
-    JLabel lblSelectedMp3;
-    JLabel lblMp3Path;
-    JButton btnSave;
-    JComboBox<EExchange> cmbExchange;
-    CAppConfig appConfig;
+    private JLabel lblSelectedMp3;
+    private JLabel lblMp3Path;
+    private JButton btnSave;
+    private JComboBox<EExchange> cmbExchange;
+    private CAppConfig appConfig;
 
     public CGeneralSettingFrame() throws HeadlessException {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -41,12 +41,12 @@ public class CGeneralSettingFrame extends JFrame {
         btnSave.setPreferredSize(btnSave.getPreferredSize());
         btnSave.addActionListener(event -> save());
 
-        lblSelectedMp3 = new JLabel("Звук оповещения: ");
+        lblSelectedMp3 = new JLabel("Signal sound: ");
         lblMp3Path = new JLabel(appConfig.getNotificationSound() == null ? "Default" : appConfig.getNotificationSound());
-        JButton btnSelect = new JButton("Выбрать");
-        btnSelect.addActionListener(e -> {
-                JFileChooser fileopen = new JFileChooser();
-                fileopen.addChoosableFileFilter(new FileFilter() {
+        JButton btnSelectSound = new JButton("Select");
+        btnSelectSound.addActionListener(e -> {
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.addChoosableFileFilter(new FileFilter() {
                     @Override
                     public boolean accept(File f) {
                         return f.isDirectory() || f.getName().toLowerCase().endsWith(".mp3");
@@ -58,16 +58,16 @@ public class CGeneralSettingFrame extends JFrame {
                     }
                 });
 
-                int ret = fileopen.showDialog(null, "Открыть файл");
+                int ret = fileChooser.showDialog(null, "Open file");
                 if (ret == JFileChooser.APPROVE_OPTION) {
-                    File file = fileopen.getSelectedFile();
+                    File file = fileChooser.getSelectedFile();
                     lblMp3Path.setText(file.getAbsolutePath());
                 }
         });
         JPanel selectMp3 = new JPanel();
         selectMp3.add(lblSelectedMp3);
         selectMp3.add(lblMp3Path);
-        selectMp3.add(btnSelect);
+        selectMp3.add(btnSelectSound);
 
         JPanel p = new JPanel();
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));

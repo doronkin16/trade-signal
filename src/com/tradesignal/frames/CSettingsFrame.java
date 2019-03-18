@@ -12,12 +12,12 @@ import com.tradesignal.spring.*;
 
 public class CSettingsFrame extends JFrame {
 
-    JComboBox<EExchange> cmbExchange;
-    CAbstractExchangeConfig exchangeConfig;
+    private JComboBox<EExchange> cmbExchange;
+    private CAbstractExchangeConfig exchangeConfig;
 
-    JTable persantTable;
-    JButton btnSave;
-    JSpinner spnChangesBy;
+    private JTable percentTable;
+    private JButton btnSave;
+    private JSpinner spnChangesBy;
 
     public CSettingsFrame() throws HeadlessException {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -26,7 +26,7 @@ public class CSettingsFrame extends JFrame {
     }
 
     private void init() {
-        exchangeConfig = CSpringContextUtils.getExchangeConfig(CSpringContextUtils.getAppConfig().getExchange());
+        exchangeConfig = CSpringContextUtils.getAbstractExchangeConfig(CSpringContextUtils.getAppConfig().getExchange());
         createComponents();
     }
 
@@ -36,22 +36,22 @@ public class CSettingsFrame extends JFrame {
         cmbExchange.setSelectedItem(exchangeConfig.getExchangeType());
         cmbExchange.setVisible(false);
         cmbExchange.addItemListener(event -> {
-            exchangeConfig = CSpringContextUtils.getExchangeConfig((EExchange) cmbExchange.getSelectedItem());
-            persantTable.setModel(new ThisColumnModel(exchangeConfig.getTickersValues()));
+            exchangeConfig = CSpringContextUtils.getAbstractExchangeConfig((EExchange) cmbExchange.getSelectedItem());
+            percentTable.setModel(new ThisColumnModel(exchangeConfig.getTickersValues()));
         });
 
-        persantTable = new JTable(null, new Object[]{"Currency", "Percant"});
-        persantTable.setModel(new ThisColumnModel(exchangeConfig.getTickersValues()));
-        JScrollPane sp = new JScrollPane(persantTable);
+        percentTable = new JTable(null, new Object[]{"Currency", "Percent"});
+        percentTable.setModel(new ThisColumnModel(exchangeConfig.getTickersValues()));
+        JScrollPane sp = new JScrollPane(percentTable);
 
         btnSave = new JButton("Save");
         btnSave.setPreferredSize(btnSave.getPreferredSize());
         btnSave.addActionListener(event -> save());
 
         JPanel setChangesByPanel = new JPanel();
-        JLabel lblChangesBY = new JLabel("Показвать изменения за ");
+        JLabel lblChangesBY = new JLabel("Show changes in ");
         spnChangesBy = new JSpinner(new SpinnerNumberModel(exchangeConfig.getChangesByTime(), 20, 1000, 5));
-        JLabel lblSeconds = new JLabel(" секунд");
+        JLabel lblSeconds = new JLabel(" seconds");
         setChangesByPanel.add(lblChangesBY);
         setChangesByPanel.add(spnChangesBy);
         setChangesByPanel.add(lblSeconds);
@@ -67,7 +67,7 @@ public class CSettingsFrame extends JFrame {
     }
 
     private void save() {
-        ((ThisColumnModel) persantTable.getModel()).rows.forEach(entry -> exchangeConfig.setChangesProp(entry.getKey(), entry.getValue()));
+        ((ThisColumnModel) percentTable.getModel()).rows.forEach(entry -> exchangeConfig.setChangesProp(entry.getKey(), entry.getValue()));
         exchangeConfig.setChangesByTime(((Number) spnChangesBy.getValue()).intValue());
 
         exchangeConfig.savePropFile();
@@ -93,9 +93,9 @@ public class CSettingsFrame extends JFrame {
         @Override
         public String getColumnName(int column) {
             if (column == 0) {
-                return "Валютная пара";
+                return "Currency pair";
             } else if (column == 1) {
-                return "Сигнализировать при увеличении на, %";
+                return "To signal on growth on, %";
             }
             return null;
         }
