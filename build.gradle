@@ -30,3 +30,14 @@ dependencies {
     compile("org.springframework:spring-beans:" + springVersion)
     compile("org.springframework:spring-context:" + springVersion)
 }
+
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'Trade Signal',
+                'Implementation-Version': version,
+                'Main-Class': 'com.tradesignal.Launcher'
+    }
+    baseName = 'Trade_Signal-release'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
